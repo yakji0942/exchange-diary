@@ -72,8 +72,20 @@ export async function loadConfig(client) {
 
 export async function initConfig(client, firstMember) {
   const config = { members: [firstMember] }
-  await client.putJson(CONFIG_PATH, config, { message: '교환 일지 설정 초기화' })
-  await client.putJson(INDEX_PATH, {}, { message: '일지 색인 초기화' })
+
+  const existingConfig = await client.getJson(CONFIG_PATH)
+  const existingIndex = await client.getJson(INDEX_PATH)
+
+  await client.putJson(CONFIG_PATH, config, {
+    sha: existingConfig?.sha,
+    message: '교환 일지 설정 초기화',
+  })
+
+  await client.putJson(INDEX_PATH, {}, {
+    sha: existingIndex?.sha,
+    message: '일지 색인 초기화',
+  })
+
   return config
 }
 
